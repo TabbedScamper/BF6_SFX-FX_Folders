@@ -20,22 +20,25 @@ maps straight from the Object Library — organized into a tidy **FX** and
    [latest release](https://github.com/TabbedScamper/BF6_SFX-FX_Folders/releases/latest)
    and extract it into your Portal SDK Godot **project folder** (it merges
    into `addons/bf6_sfx_fx/`). Any folder under `addons/` works too.
-2. Enable **BF6 SFX & FX Folders** under Project → Project Settings → Plugins.
-3. In the **SFX & FX** dock (top right), hit **Install / Repair**.
-4. Restart the editor. Open any map — the Object Library now shows the FX and
+2. **Enable "BF6 SFX & FX Folders"** under Project → Project Settings → Plugins.
+   That's the whole install — enabling it sets everything up.
+3. Restart the editor. Open any map — the Object Library now shows the FX and
    SFX folders.
 
-Everything the installer does is reversible: it keeps backups and the dock's
-**Restore stock library view** button puts the original Scene Library back.
-Effects already placed in your levels keep working either way.
+**The plugin toggle IS the switch:** enabling installs the folder view,
+**disabling puts the stock library back**. Restart the editor after toggling so
+the Object Library redraws. No buttons, no extra panel.
 
-## What the installer changes
+## What enabling/disabling changes
 
-| Step | What | Undo |
-|---|---|---|
-| Library content | Extracts the wrapper scenes/scripts to `objects/fx`, `objects/audio`, `scripts/fx`, `scripts/audio` | Files are inert if unused; kept on restore so placed effects don't break |
-| Folder view | Replaces the Scene Library addon's script with the folder-view build | Original backed up as `scene_library.gd.stock`, restored by the Restore button |
-| Collections | Adds the per-map FX/SFX collections to `scene_library.json` | Pre-install backup kept; Restore removes only these collections |
+| On enable | Undo (on disable) |
+|---|---|
+| Extracts the FX/SFX wrapper scenes/scripts into `objects/fx`, `objects/audio`, `scripts/fx`, `scripts/audio` (one time; skipped if already present) | Files are **kept** so effects already placed in your levels don't break |
+| Replaces the Scene Library addon's script with the folder-view build (stock backed up as `scene_library.gd.stock`) | Stock script restored |
+| Adds the per-map FX/SFX collections to `scene_library.json` (backed up first) | Only these collections are removed |
+
+> First-time enable extracts ~1,400 effect scenes and Godot imports them once —
+> give it a minute. Re-enabling later is instant (the files are already there).
 
 ## Credits
 
