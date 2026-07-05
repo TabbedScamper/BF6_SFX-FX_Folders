@@ -33,15 +33,38 @@ func _enable_plugin() -> void:
 	var lib := _apply_folder_view()
 	var colls := _merge_collections()
 	EditorInterface.get_resource_filesystem().scan()
-	print("[SFX & FX] Enabled — %s; %s; %s. Restart the editor if the Object Library doesn't refresh." % [
-		("content ready" if files < 0 else "%d files installed" % files), lib, colls])
+	var reloaded := _reload_object_library()  # so the folders appear without a restart
+	print("[SFX & FX] Enabled — %s; %s; %s; %s." % [
+		("content ready" if files < 0 else "%d files installed" % files), lib, colls, reloaded])
 
 # ---------- disable = revert (keep the wrapper files) ----------
 func _disable_plugin() -> void:
 	var lib := _restore_folder_view()
 	var colls := _remove_collections()
 	EditorInterface.get_resource_filesystem().scan()
-	print("[SFX & FX] Disabled — %s; %s. Wrapper files kept (placed effects keep working)." % [lib, colls])
+	var reloaded := _reload_object_library()
+	print("[SFX & FX] Disabled — %s; %s; %s. Wrapper files kept (placed effects keep working)." % [lib, colls, reloaded])
+
+# Ask the running Object Library (Scene Library addon) to re-read its library
+# from disk, so a collection change we just made shows up without an editor
+# restart. Best-effort: if the node or method isn't found, the change still
+# lands on the next restart.
+func _reload_object_library() -> String:
+	var lib := EditorInterface.get_base_control().find_children("ObjectLibrary", "", true, false)
+	if lib.is_empty():
+		return "restart to refresh the library"
+	var node = lib[0]
+	# the Scene Library remembers its path in a project setting; fall back to the
+	# addon's default json
+	var path := "res://addons/scene-library/scene_library.json"
+	var setting := "addons/scene_library/library/current_library_path"
+	if ProjectSettings.has_setting(setting):
+		var p := str(ProjectSettings.get_setting(setting))
+		if p != "": path = p
+	if node.has_method("load_library"):
+		node.call("load_library", path)
+		return "library reloaded"
+	return "restart to refresh the library"
 
 # ---------- content ----------
 # Returns files written, 0 if already installed, -1 if the archive is missing.
