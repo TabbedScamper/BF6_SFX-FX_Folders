@@ -773,6 +773,21 @@ func update_item_list() -> void:
 			if not gsx.is_empty(): sfx_cols.append(gsx)
 			if not sfx_cols.is_empty():
 				folders.append({"__hp_folder": sfx_cols, "__hp_label": "SFX"})
+			# every effect our FX/SFX folders own is HIDDEN from the stock
+			# collection list — one home per asset, no duplicates in the root
+			var _hp_owned := {}
+			for c in fx_cols:
+				for a: Dictionary in c.assets:
+					_hp_owned[a.path] = true
+			for c in sfx_cols:
+				for a: Dictionary in c.assets:
+					_hp_owned[a.path] = true
+			if not _hp_owned.is_empty():
+				var _hp_kept: Array = []
+				for a: Dictionary in assets:
+					if not _hp_owned.has(a.path):
+						_hp_kept.append(a)
+				assets = _hp_kept
 	_item_list.set_item_count(folders.size() + assets.size())
 
 	var queries: PackedStringArray = _asset_filter_line.get_text().split(" ", false)
